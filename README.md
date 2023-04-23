@@ -1,4 +1,4 @@
-# meals_planner
+# Meals Planner
 
 Meals planner project by Kacper G.
 
