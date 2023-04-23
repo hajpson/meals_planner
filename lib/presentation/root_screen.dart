@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals_planner/logic/meals/meals_cubit.dart';
-import 'package:meals_planner/models/NavbarItem.dart';
-import 'package:meals_planner/logic/main_navigation/main_navigation_cubit.dart';
 import 'package:meals_planner/presentation/main_navigation/meals_screen.dart';
 import 'package:meals_planner/presentation/main_navigation/settings_screen.dart';
 import 'package:meals_planner/presentation/main_navigation/products_screen.dart';
@@ -11,26 +9,55 @@ import 'package:meals_planner/presentation/main_navigation/products_screen.dart'
 import '../constants/colors.dart';
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({super.key});
-
   @override
   State<RootScreen> createState() => _RootScreenState();
 }
 
 class _RootScreenState extends State<RootScreen> {
+  var _selectedPageIndex;
+  late List<Widget> _pages;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedPageIndex = 0;
+
+    _pages = [
+      BlocProvider<MealsCubit>(
+            create: (context) => MealsCubit(),
+            child: MealsScreen()
+      ),
+      ProductsScreen(),
+      SettingsScreen()
+    ];
+
+    _pageController = PageController(initialPage: _selectedPageIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding: EdgeInsets.all(10),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          child: BlocBuilder<MainNavigationCubit, MainNavigationState>(
-              builder: (context, state) {
-        return Container(
-          decoration: const BoxDecoration(
+      body: PageView(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        children: _pages,
+      ),
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20)
+        ),
+        child: Container(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.topRight,
@@ -43,48 +70,27 @@ class _RootScreenState extends State<RootScreen> {
             )
           ),
           child: BottomNavigationBar(
-            currentIndex: state.index,
             showUnselectedLabels: false,
+            iconSize: 28,
+            unselectedItemColor: lightWhiteColor,
+            selectedItemColor: Colors.white,
+            elevation: 0,
             backgroundColor: Colors.transparent,
             selectedLabelStyle: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16
             ),
-            iconSize: 28,
-            unselectedItemColor: lightWhiteColor,
-            selectedItemColor: Colors.white,
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
             items: bottomAppBarItems,
-            onTap: (index) => {
-              if (index == 0) {
-                BlocProvider.of<MainNavigationCubit>(context)
-                  .setNavBartItem(NavbarItem.meals)
-              } else if (index == 1) {
-                BlocProvider.of<MainNavigationCubit>(context)
-                  .setNavBartItem(NavbarItem.settings)
-              } else {
-                BlocProvider.of<MainNavigationCubit>(context)
-                  .setNavBartItem(NavbarItem.products)
-              }
-            }),
-        );
-        }),
+            currentIndex: _selectedPageIndex,
+            onTap: (selectedPageIndex) {
+              setState(() {
+                _selectedPageIndex = selectedPageIndex;
+                _pageController.jumpToPage(_selectedPageIndex);
+              });
+            },
+          ),
+        ),
       ),
-    ),
-    body: BlocBuilder<MainNavigationCubit, MainNavigationState>(
-      builder: (context, state) {
-        if (state.navbarItem == NavbarItem.meals) {
-          return BlocProvider<MealsCubit>(
-            create: (context) => MealsCubit(),
-            child: MealsScreen(),
-          );
-        } else if (state.navbarItem == NavbarItem.settings) {
-          return ProductsScreen();
-        } else {
-          return SettingsScreen() ;
-        }
-      }),
     );
   }
 }

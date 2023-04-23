@@ -12,12 +12,16 @@ class MealsScreen extends StatefulWidget {
   State<MealsScreen> createState() => _MealsScreenState();
 }
 
-class _MealsScreenState extends State<MealsScreen> {
+class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return SafeArea(
       child: Scaffold(
-        extendBody: true,
         body: Center(
           child: Container(
            child : BlocBuilder<MealsCubit, MealsState>(
@@ -42,6 +46,7 @@ class _MealsScreenState extends State<MealsScreen> {
                 final meals = state.meals;
 
                 return ListView.builder(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
                   physics: BouncingScrollPhysics(),
                   itemCount: meals.length,
                   itemBuilder: (context, index) => Padding(
