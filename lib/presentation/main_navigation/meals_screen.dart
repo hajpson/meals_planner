@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:meals_planner/constants/colors.dart';
 import 'package:meals_planner/logic/meals/meals_cubit.dart';
+import 'package:meals_planner/logic/new_meal/new_meal_cubit.dart';
 import '../../logic/meals/meals_state.dart';
+import '../new_meal/new_meal_screen.dart';
+import '../shared/NoDataScreen.dart';
 
 class MealsScreen extends StatefulWidget {
   const MealsScreen({super.key});
@@ -22,6 +25,31 @@ class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClient
 
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: primaryColor, width: 2)
+          ),
+          child: InkWell(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.add, size: 30, color: primaryColor,),
+            ),
+            onTap: () => {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider<NewMealCubit>(
+                    create: (context) => NewMealCubit(),
+                    child: NewMealScreen()
+                  )
+                )
+              )
+            },
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         body: Center(
           child: Container(
            child : BlocBuilder<MealsCubit, MealsState>(
@@ -44,6 +72,10 @@ class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClient
                 );
               } else if (state is LoadedState) {
                 final meals = state.meals;
+
+                if (meals.isEmpty) {
+                  return NoDataScreen();
+                }
 
                 return ListView.builder(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
@@ -78,7 +110,7 @@ class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClient
                   )
                 );
               } else {
-                return Container();
+                return NoDataScreen();
               }
             },
            ),

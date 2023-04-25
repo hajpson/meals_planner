@@ -1,7 +1,9 @@
+import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals_planner/logic/meals/meals_cubit.dart';
+import 'package:meals_planner/logic/products/products_cubit.dart';
 import 'package:meals_planner/presentation/main_navigation/meals_screen.dart';
 import 'package:meals_planner/presentation/main_navigation/settings_screen.dart';
 import 'package:meals_planner/presentation/main_navigation/products_screen.dart';
@@ -26,10 +28,13 @@ class _RootScreenState extends State<RootScreen> {
 
     _pages = [
       BlocProvider<MealsCubit>(
-            create: (context) => MealsCubit(),
-            child: MealsScreen()
+        create: (context) => MealsCubit(),
+        child: MealsScreen()
       ),
-      ProductsScreen(),
+      BlocProvider<ProductsCubit>(
+        create: (context) => ProductsCubit(),
+        child: ProductsScreen(),
+      ),
       SettingsScreen()
     ];
 
@@ -39,64 +44,81 @@ class _RootScreenState extends State<RootScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-
     super.dispose();
   }
+
+  final bottomAppBarItems = [
+    CustomNavigationBarItem(
+      icon: Icon(Icons.fastfood), 
+      title: Text('Meals'),
+      selectedTitle: Text(
+        'Meals',
+        style: TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 17
+        ),
+      )
+    ),
+    CustomNavigationBarItem(
+      icon: Icon(Icons.shopping_basket), 
+      title: Text('Products'),
+      selectedTitle: Text(
+        'Products',
+        style: TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 17
+        ),
+      )
+    ),
+    CustomNavigationBarItem(
+      icon: Icon(Icons.settings), 
+      title: Text('Settings'),
+      selectedTitle: Text(
+        'Settings',
+        style: TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 17
+        ),
+      )
+    )
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: PageView(
         controller: _pageController,
         physics: NeverScrollableScrollPhysics(),
         children: _pages,
       ),
-      bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20)
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: CustomNavigationBar(
+          items: bottomAppBarItems,
+          isFloating: true,
+          iconSize: 30,
+          strokeColor: Colors.transparent,
+          selectedColor: primaryColor,
+          unSelectedColor: Color.fromARGB(133, 99, 99, 99),
+          scaleFactor: 0.1,
+          scaleCurve: Curves.easeOutExpo,
+          blurEffect: true,
+          backgroundColor: lightWhiteColor,
+          elevation: 1,
+          borderRadius: Radius.circular(16),
+          currentIndex: _selectedPageIndex,
+          onTap: (selectedPageIndex) {
+            setState(() {
+              _selectedPageIndex = selectedPageIndex;
+              _pageController.jumpToPage(_selectedPageIndex);
+            });
+          },
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.topRight,
-              stops: [0, 1],
-              tileMode: TileMode.clamp,
-              colors: [
-                Color.fromARGB(255, 202, 109, 255),
-                Color.fromARGB(255, 23, 151, 255)
-              ]
-            )
-          ),
-          child: BottomNavigationBar(
-            showUnselectedLabels: false,
-            iconSize: 28,
-            unselectedItemColor: lightWhiteColor,
-            selectedItemColor: Colors.white,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            selectedLabelStyle: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16
-            ),
-            items: bottomAppBarItems,
-            currentIndex: _selectedPageIndex,
-            onTap: (selectedPageIndex) {
-              setState(() {
-                _selectedPageIndex = selectedPageIndex;
-                _pageController.jumpToPage(_selectedPageIndex);
-              });
-            },
-          ),
-        ),
-      ),
+      )
     );
   }
 }
-
-const bottomAppBarItems = [
-  BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: 'Meals'),
-  BottomNavigationBarItem(icon: Icon(Icons.shopping_basket), label: 'Products'),
-  BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings')
-];
