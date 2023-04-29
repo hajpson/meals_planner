@@ -1,22 +1,15 @@
+import 'package:isar/isar.dart';
+
+part 'Product.g.dart';
+
+@collection
 class Product {
-  late int id;
-  late String name;
-  late String shortDescription;
-  late String longDescription;
-
-  Product.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
-    name = map['name'];
-    shortDescription = map['shortDescription'];
-    longDescription = map['longDescription'];
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'shortDescription': shortDescription,
-      'longDescription': longDescription,
-    };
-  }
+  Id id = Isar.autoIncrement;
+  String? name;
+  String? shortDescription;
+  int? proteins;
+  int? carbohydrates;
+  int? fats;
+  int? calories;
+  int? price;
 }

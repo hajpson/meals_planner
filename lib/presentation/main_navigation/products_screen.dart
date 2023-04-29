@@ -77,7 +77,7 @@ class _ProductsScreenState extends State<ProductsScreen> with AutomaticKeepAlive
                         borderRadius: BorderRadius.circular(20)
                       ),
                       title: Text(
-                        products[index].name,
+                        products[index].name!,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: primaryColor,
@@ -85,7 +85,7 @@ class _ProductsScreenState extends State<ProductsScreen> with AutomaticKeepAlive
                         ),
                       ),
                       subtitle: Text(
-                        products[index].shortDescription,
+                        products[index].shortDescription!,
                         style: TextStyle(
                           fontSize: 16
                         ),

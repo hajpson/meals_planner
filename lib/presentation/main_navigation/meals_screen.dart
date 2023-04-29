@@ -90,7 +90,7 @@ class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClient
                         borderRadius: BorderRadius.circular(20)
                       ),
                       title: Text(
-                        meals[index].mealName,
+                        meals[index].mealName!,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: primaryColor,
@@ -98,13 +98,10 @@ class _MealsScreenState extends State<MealsScreen> with AutomaticKeepAliveClient
                         ),
                       ),
                       subtitle: Text(
-                        meals[index].mealDescription,
+                        meals[index].mealDescription!,
                         style: TextStyle(
                           fontSize: 16
                         ),
-                      ),
-                      trailing: SizedBox(
-                        child: meals[index].icon,
                       ),
                     ),
                   )

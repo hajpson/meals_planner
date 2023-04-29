@@ -1,13 +1,25 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:meals_planner/constants/appwrite_data.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
-Client prepareClient() {
-  Client client = Client();
+import '../../models/MealModel.dart';
 
-  client
-  .setEndpoint(API_URL)
-  .setProject(PROJECT_ID)
-  .setSelfSigned(status: true);
+// Client prepareClient() {
+//   Client client = Client();
 
-  return client;
+//   client
+//   .setEndpoint(API_URL)
+//   .setProject(PROJECT_ID)
+//   .setSelfSigned(status: true);
+
+//   return client;
+// }
+
+Future<Isar> initializeIsar() async {
+  final directory = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [MealModelSchema],
+    directory: directory.path
+  );
+
+  return isar;
 }

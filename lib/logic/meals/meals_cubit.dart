@@ -10,7 +10,7 @@ class MealsCubit extends Cubit<MealsState> {
   void getMealsData() async {
     try {
       emit(LoadingState());
-      final meals = await getMeals();
+      final meals = await getMealsAsync();
       emit(LoadedState(meals));
     } catch (_) {
       emit(ErrorState());

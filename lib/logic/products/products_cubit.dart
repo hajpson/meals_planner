@@ -10,7 +10,7 @@ class ProductsCubit extends Cubit<ProductsState> {
   void getProductsData() async {
     try {
       emit(LoadingState());
-      final products = await getProducts();
+      final products = await getProductsAsync();
       emit(LoadedState(products));
     } catch (_) {
       emit(ErrorState());

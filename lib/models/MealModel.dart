@@ -1,26 +1,22 @@
-import 'package:flutter/cupertino.dart';
+import 'package:isar/isar.dart';
 
+part 'MealModel.g.dart';
+
+@collection
 class MealModel {
-  late int id;
-  late String mealName;
-  late String mealDescription;
-  late Icon icon;
+  Id id = Isar.autoIncrement;
+  String? mealName;
+  String? mealDescription;
+  List<Product>? products;
+}
 
-  MealModel.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
-    mealName = map['mealName'];
-    mealDescription = map['mealDescription'];
-    icon = Icon(IconData(int.parse(map['icon']), fontFamily: 'MaterialIcons'));
-  }
-
-  MealModel(
-    int id, 
-    String mealName,
-    String mealDesc,
-    Icon icon) {
-    this.id = id;
-    this.mealName = mealName;
-    this.mealDescription = mealDesc;
-    this.icon = icon;
-  }
+@embedded
+class Product {
+  String? name;
+  String? shortDescription;
+  int? proteins;
+  int? carbohydrates;
+  int? fats;
+  int? calories;
+  int? price;
 }

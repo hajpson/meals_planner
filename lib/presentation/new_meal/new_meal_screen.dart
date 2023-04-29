@@ -92,8 +92,8 @@ class _NewMealScreen extends State<NewMealScreen> {
                         child: Padding(
                           padding: EdgeInsets.only(left: 15, right: 15, top: 5),
                           child: TextFormField(
-                            maxLength: 250,
-                            maxLines: 4,
+                            maxLength: 10000,
+                            maxLines: 10,
                             cursorColor: secondaryColor,
                             decoration: InputDecoration(
                               border: InputBorder.none,
@@ -110,28 +110,69 @@ class _NewMealScreen extends State<NewMealScreen> {
                     Padding(
                       padding: EdgeInsets.all(10),
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: lightGrayColor,
-                          borderRadius: new BorderRadius.circular(16)
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 15, right: 15, top: 5),
-                          child: TextFormField(
-                            maxLength: 10000,
-                            maxLines: 12,
-                            cursorColor: secondaryColor,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              labelText: 'Meal long description',
-                              alignLabelWithHint: true,
-                              labelStyle: TextStyle(
-                                color: secondaryColor
-                              )
+                        alignment: Alignment.center,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
+                            backgroundColor: secondaryColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)
                             ),
+                            shadowColor: Color.fromARGB(53, 0, 0, 0)
                           ),
-                        ),
+                          onPressed: () {
+                            showDialog(
+                              context: context, 
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: Stack(
+                                    children: [
+                                      Positioned(
+                                        right: -40,
+                                        top: -40,
+                                        child: InkResponse(
+                                          onTap: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: CircleAvatar(
+                                            child: Icon(Icons.close),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        )
+                                      ),
+                                      Form(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: TextFormField(),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: TextFormField(),
+                                            ),
+                                    ],
+                                  ),
+                                )
+                              ]
+                            )
+                          );
+                        }
+                      );
+                    },
+                    child: Text(
+                      'Press to add product for meal',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color.fromARGB(212, 255, 255, 255)
                       ),
-                    )
+                    ),
+                  ),
+                ),
+              )
                   ],
                 ),
               ),

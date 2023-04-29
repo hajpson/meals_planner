@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:isar/isar.dart';
 import '../../models/MealModel.dart';
 
 abstract class MealsState extends Equatable {}
