@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 part 'MealModel.g.dart';
 
 @collection
+@Name("Meals")
 class MealModel {
   Id id = Isar.autoIncrement;
   String? mealName;

@@ -3,13 +3,12 @@ import 'package:meals_planner/logic/repository/initializer.dart';
 import 'package:meals_planner/models/Product.dart';
 
 Future<List<Product>> getProductsAsync() async {
-  final isar = await initializeIsar();
-  List<Product> meals = [];
+  final isar = await initializeProductsInstance();
+  List<Product> products = [];
 
   await isar.txn(() async {
-    meals = await isar.products.where().findAll();
+    products = await isar.products.where().findAll();
   });
 
-  return meals;
+  return products;
 }
-

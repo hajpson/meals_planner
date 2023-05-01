@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import '../../models/MealModel.dart';
+import '../repository/initializer.dart';
 import '../services/meals_service.dart';
 import 'meals_state.dart';
 
@@ -15,5 +17,9 @@ class MealsCubit extends Cubit<MealsState> {
     } catch (_) {
       emit(ErrorState());
     }
+  }
+
+  Future<bool> deleteMeal(MealModel meal) async {
+    return await deleteMealAsync(meal);
   }
 }

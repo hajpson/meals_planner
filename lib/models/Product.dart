@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 part 'Product.g.dart';
 
 @collection
+@Name("Products")
 class Product {
   Id id = Isar.autoIncrement;
   String? name;

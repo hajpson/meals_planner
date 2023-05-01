@@ -14,8 +14,8 @@ extension GetMealModelCollection on Isar {
 }
 
 const MealModelSchema = CollectionSchema(
-  name: r'MealModel',
-  id: -8574582237306330440,
+  name: r'Meals',
+  id: -8272667974540905985,
   properties: {
     r'mealDescription': PropertySchema(
       id: 0,
