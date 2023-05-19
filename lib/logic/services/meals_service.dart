@@ -33,8 +33,8 @@ Future<bool> addNewMealAsync(MealModel meal) async {
   bool hasAdded = false;
 
   await isar.writeTxn(() async {
-    var userExists = await isar.mealModels.put(meal);
-    hasAdded = !userExists.isNaN;
+    var itemCreated = await isar.mealModels.put(meal);
+    hasAdded = !itemCreated.isNaN;
   });
 
   return hasAdded;

@@ -1,28 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:meals_planner/constants/colors.dart';
-import 'package:meals_planner/logic/new_meal/new_meal_cubit.dart';
-import 'package:meals_planner/logic/new_meal/new_meal_state.dart';
-import 'package:meals_planner/models/MealModel.dart';
-import 'package:meals_planner/presentation/new_meal/search_products_view.dart';
+import 'package:meals_planner/logic/new_product/new_product_cubit.dart';
+import 'package:meals_planner/models/Product.dart';
+import '../../logic/new_product/new_product_state.dart';
+import '../shared/MacroCard.dart';
+import '../shared/MacroSummaryCard.dart';
 
-class NewMealScreen extends StatefulWidget {
-  const NewMealScreen({super.key});
+class NewProductScreen extends StatefulWidget {
+  const NewProductScreen({super.key});
 
   @override
-  State<NewMealScreen> createState() => _NewMealScreen();
+  State<NewProductScreen> createState() => _NewProductScreen();
 }
 
-class _NewMealScreen extends State<NewMealScreen> {
-  final mealNameController = TextEditingController();
-  final mealDescController = TextEditingController();
+class _NewProductScreen extends State<NewProductScreen> {
+  final productNameController = TextEditingController();
+  final productDescController = TextEditingController();
+  final productProteinsController = TextEditingController();
+  final productCarbsController = TextEditingController();
+  final productFatsController = TextEditingController();
+  final productCaloriesController = TextEditingController();
+  final productPriceController = TextEditingController();
+
+  Product _prepareNewProduct() {
+    final newProduct = Product();
+
+    final productProteins = productProteinsController.text.isEmpty
+        ? 0.0
+        : double.parse(productProteinsController.text);
+    final productCarbs = productCarbsController.text.isEmpty
+        ? 0.0
+        : double.parse(productCarbsController.text);
+    final productFats = productFatsController.text.isEmpty
+        ? 0.0
+        : double.parse(productFatsController.text);
+    final productCalories = productCaloriesController.text.isEmpty
+        ? 0.0
+        : double.parse(productCaloriesController.text);
+    final productPrice = productPriceController.text.isEmpty
+        ? 0.0
+        : double.parse(productPriceController.text);
+
+    newProduct
+      ..name = productNameController.text
+      ..description = productDescController.text
+      ..proteins = productProteins
+      ..carbohydrates = productCarbs
+      ..fats = productFats
+      ..calories = productCalories
+      ..price = productPrice;
+
+    return newProduct;
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: BlocBuilder<NewMealCubit, NewMealState>(
+        body: BlocBuilder<NewProductCubit, NewProductState>(
           builder: (context, state) {
             if (state is LoadingState) {
               return Center(
@@ -84,17 +122,16 @@ class _NewMealScreen extends State<NewMealScreen> {
                                         new BorderRadius.circular(16)),
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                      left: 15, right: 15, top: 5),
+                                      left: 15, right: 15, top: 5, bottom: 5),
                                   child: TextFormField(
-                                    controller: mealNameController,
+                                    controller: productNameController,
                                     cursorColor: secondaryColor,
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        labelText: 'Meal name',
+                                        labelText: 'Product name',
                                         labelStyle: TextStyle(
-                                          color: secondaryColor,
-                                          fontWeight: FontWeight.bold,
-                                        )),
+                                            color: secondaryColor,
+                                            fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ),
@@ -108,55 +145,85 @@ class _NewMealScreen extends State<NewMealScreen> {
                                         new BorderRadius.circular(16)),
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                      left: 15, right: 15, top: 5),
+                                      left: 15, right: 15, top: 5, bottom: 5),
                                   child: TextFormField(
-                                    controller: mealDescController,
+                                    controller: productDescController,
                                     maxLength: 10000,
                                     maxLines: 10,
                                     cursorColor: secondaryColor,
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
                                         alignLabelWithHint: true,
-                                        labelText: 'Meal description',
+                                        labelText: 'Product description',
                                         labelStyle: TextStyle(
-                                          color: secondaryColor,
-                                          fontWeight: FontWeight.bold,
-                                        )),
+                                            color: secondaryColor,
+                                            fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      minimumSize: const Size.fromHeight(50),
-                                      backgroundColor: secondaryColor,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                      shadowColor: Color.fromARGB(53, 0, 0, 0)),
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return SearchProductsView();
-                                        });
-                                  },
-                                  child: Text(
-                                    'Press to add product',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color:
-                                            Color.fromARGB(212, 255, 255, 255)),
+                                padding: EdgeInsets.all(10),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: lightGreyColor,
+                                      borderRadius:
+                                          new BorderRadius.circular(16)),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 0, right: 0, top: 10, bottom: 10),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            MacroCard(
+                                                name: 'Proteins',
+                                                controller:
+                                                    productProteinsController),
+                                            MacroCard(
+                                                name: 'Carbs',
+                                                controller:
+                                                    productCarbsController),
+                                            MacroCard(
+                                                name: 'Fats',
+                                                controller:
+                                                    productFatsController),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, left: 10, right: 10),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    new BorderRadius.circular(
+                                                        16)),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  MacroSummaryCard(
+                                                      name: 'KCal',
+                                                      controller:
+                                                          productCaloriesController),
+                                                  MacroSummaryCard(
+                                                      name: "\$",
+                                                      controller:
+                                                          productPriceController)
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
+                                )),
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: Padding(
@@ -173,16 +240,14 @@ class _NewMealScreen extends State<NewMealScreen> {
                                         shadowColor:
                                             Color.fromARGB(53, 0, 0, 0)),
                                     onPressed: () async {
-                                      final newMeal = MealModel()
-                                        ..mealName = mealNameController.text
-                                        ..mealDescription =
-                                            mealDescController.text;
-                                      final newMealsCubit =
-                                          context.read<NewMealCubit>();
-                                      await newMealsCubit.addNewMeal(newMeal);
+                                      final newProduct = _prepareNewProduct();
+                                      final newProductCubit =
+                                          context.read<NewProductCubit>();
+                                      await newProductCubit
+                                          .addNewProduct(newProduct);
                                     },
                                     child: Text(
-                                      'Add new meal',
+                                      'Add new product',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,

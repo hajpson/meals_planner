@@ -1,0 +1,1 @@
+enum ScreenIndicator { Meals, Products }

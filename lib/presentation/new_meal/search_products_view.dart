@@ -5,35 +5,36 @@ class SearchProductsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-        content: Stack(children: [
-      Positioned(
-          right: -20,
-          top: -30,
-          child: InkResponse(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: CircleAvatar(
-              child: Icon(Icons.close),
-              backgroundColor: Colors.red,
-            ),
-          )),
-      Form(
+    return Dialog.fullscreen(
+      child: Container(
+        width: double.maxFinite,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextFormField(),
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Go back'),
+                ),
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextFormField(),
+              padding: const EdgeInsets.all(12.0),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Text('data'),
+                  Text('data2'),
+                ],
+              ),
             ),
           ],
         ),
-      )
-    ]));
+      ),
+    );
   }
 }

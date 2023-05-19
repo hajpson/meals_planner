@@ -14,43 +14,43 @@ extension GetProductCollection on Isar {
 }
 
 const ProductSchema = CollectionSchema(
-  name: r'Product',
-  id: -6222113721139403729,
+  name: r'Products',
+  id: 5417479505970812963,
   properties: {
     r'calories': PropertySchema(
       id: 0,
       name: r'calories',
-      type: IsarType.long,
+      type: IsarType.double,
     ),
     r'carbohydrates': PropertySchema(
       id: 1,
       name: r'carbohydrates',
-      type: IsarType.long,
+      type: IsarType.double,
+    ),
+    r'description': PropertySchema(
+      id: 2,
+      name: r'description',
+      type: IsarType.string,
     ),
     r'fats': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'fats',
-      type: IsarType.long,
+      type: IsarType.double,
     ),
     r'name': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'price': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'price',
-      type: IsarType.long,
+      type: IsarType.double,
     ),
     r'proteins': PropertySchema(
-      id: 5,
-      name: r'proteins',
-      type: IsarType.long,
-    ),
-    r'shortDescription': PropertySchema(
       id: 6,
-      name: r'shortDescription',
-      type: IsarType.string,
+      name: r'proteins',
+      type: IsarType.double,
     )
   },
   estimateSize: _productEstimateSize,
@@ -74,13 +74,13 @@ int _productEstimateSize(
 ) {
   var bytesCount = offsets.last;
   {
-    final value = object.name;
+    final value = object.description;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
   {
-    final value = object.shortDescription;
+    final value = object.name;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
@@ -94,13 +94,13 @@ void _productSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.calories);
-  writer.writeLong(offsets[1], object.carbohydrates);
-  writer.writeLong(offsets[2], object.fats);
-  writer.writeString(offsets[3], object.name);
-  writer.writeLong(offsets[4], object.price);
-  writer.writeLong(offsets[5], object.proteins);
-  writer.writeString(offsets[6], object.shortDescription);
+  writer.writeDouble(offsets[0], object.calories);
+  writer.writeDouble(offsets[1], object.carbohydrates);
+  writer.writeString(offsets[2], object.description);
+  writer.writeDouble(offsets[3], object.fats);
+  writer.writeString(offsets[4], object.name);
+  writer.writeDouble(offsets[5], object.price);
+  writer.writeDouble(offsets[6], object.proteins);
 }
 
 Product _productDeserialize(
@@ -110,14 +110,14 @@ Product _productDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Product();
-  object.calories = reader.readLongOrNull(offsets[0]);
-  object.carbohydrates = reader.readLongOrNull(offsets[1]);
-  object.fats = reader.readLongOrNull(offsets[2]);
+  object.calories = reader.readDoubleOrNull(offsets[0]);
+  object.carbohydrates = reader.readDoubleOrNull(offsets[1]);
+  object.description = reader.readStringOrNull(offsets[2]);
+  object.fats = reader.readDoubleOrNull(offsets[3]);
   object.id = id;
-  object.name = reader.readStringOrNull(offsets[3]);
-  object.price = reader.readLongOrNull(offsets[4]);
-  object.proteins = reader.readLongOrNull(offsets[5]);
-  object.shortDescription = reader.readStringOrNull(offsets[6]);
+  object.name = reader.readStringOrNull(offsets[4]);
+  object.price = reader.readDoubleOrNull(offsets[5]);
+  object.proteins = reader.readDoubleOrNull(offsets[6]);
   return object;
 }
 
@@ -129,19 +129,19 @@ P _productDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 1:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 4:
-      return (reader.readLongOrNull(offset)) as P;
-    case 5:
-      return (reader.readLongOrNull(offset)) as P;
-    case 6:
       return (reader.readStringOrNull(offset)) as P;
+    case 5:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 6:
+      return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -253,46 +253,54 @@ extension ProductQueryFilter
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> caloriesEqualTo(
-      int? value) {
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'calories',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> caloriesGreaterThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'calories',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> caloriesLessThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'calories',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> caloriesBetween(
-    int? lower,
-    int? upper, {
+    double? lower,
+    double? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -301,6 +309,7 @@ extension ProductQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -323,47 +332,55 @@ extension ProductQueryFilter
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> carbohydratesEqualTo(
-      int? value) {
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'carbohydrates',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition>
       carbohydratesGreaterThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'carbohydrates',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> carbohydratesLessThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'carbohydrates',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> carbohydratesBetween(
-    int? lower,
-    int? upper, {
+    double? lower,
+    double? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -372,6 +389,154 @@ extension ProductQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'description',
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'description',
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'description',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'description',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> descriptionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'description',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition>
+      descriptionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'description',
+        value: '',
       ));
     });
   }
@@ -393,46 +558,54 @@ extension ProductQueryFilter
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> fatsEqualTo(
-      int? value) {
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'fats',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> fatsGreaterThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'fats',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> fatsLessThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'fats',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> fatsBetween(
-    int? lower,
-    int? upper, {
+    double? lower,
+    double? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -441,6 +614,7 @@ extension ProductQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -660,46 +834,54 @@ extension ProductQueryFilter
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> priceEqualTo(
-      int? value) {
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'price',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> priceGreaterThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'price',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> priceLessThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'price',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> priceBetween(
-    int? lower,
-    int? upper, {
+    double? lower,
+    double? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -708,6 +890,7 @@ extension ProductQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -729,46 +912,54 @@ extension ProductQueryFilter
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> proteinsEqualTo(
-      int? value) {
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'proteins',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> proteinsGreaterThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'proteins',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> proteinsLessThan(
-    int? value, {
+    double? value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'proteins',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Product, Product, QAfterFilterCondition> proteinsBetween(
-    int? lower,
-    int? upper, {
+    double? lower,
+    double? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -777,159 +968,7 @@ extension ProductQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'shortDescription',
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'shortDescription',
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition> shortDescriptionEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionLessThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition> shortDescriptionBetween(
-    String? lower,
-    String? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'shortDescription',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'shortDescription',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition> shortDescriptionMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'shortDescription',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'shortDescription',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterFilterCondition>
-      shortDescriptionIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'shortDescription',
-        value: '',
+        epsilon: epsilon,
       ));
     });
   }
@@ -963,6 +1002,18 @@ extension ProductQuerySortBy on QueryBuilder<Product, Product, QSortBy> {
   QueryBuilder<Product, Product, QAfterSortBy> sortByCarbohydratesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'carbohydrates', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> sortByDescription() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> sortByDescriptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.desc);
     });
   }
 
@@ -1013,18 +1064,6 @@ extension ProductQuerySortBy on QueryBuilder<Product, Product, QSortBy> {
       return query.addSortBy(r'proteins', Sort.desc);
     });
   }
-
-  QueryBuilder<Product, Product, QAfterSortBy> sortByShortDescription() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shortDescription', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterSortBy> sortByShortDescriptionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shortDescription', Sort.desc);
-    });
-  }
 }
 
 extension ProductQuerySortThenBy
@@ -1050,6 +1089,18 @@ extension ProductQuerySortThenBy
   QueryBuilder<Product, Product, QAfterSortBy> thenByCarbohydratesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'carbohydrates', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> thenByDescription() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> thenByDescriptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.desc);
     });
   }
 
@@ -1112,18 +1163,6 @@ extension ProductQuerySortThenBy
       return query.addSortBy(r'proteins', Sort.desc);
     });
   }
-
-  QueryBuilder<Product, Product, QAfterSortBy> thenByShortDescription() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shortDescription', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Product, Product, QAfterSortBy> thenByShortDescriptionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shortDescription', Sort.desc);
-    });
-  }
 }
 
 extension ProductQueryWhereDistinct
@@ -1137,6 +1176,13 @@ extension ProductQueryWhereDistinct
   QueryBuilder<Product, Product, QDistinct> distinctByCarbohydrates() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'carbohydrates');
+    });
+  }
+
+  QueryBuilder<Product, Product, QDistinct> distinctByDescription(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'description', caseSensitive: caseSensitive);
     });
   }
 
@@ -1164,14 +1210,6 @@ extension ProductQueryWhereDistinct
       return query.addDistinctBy(r'proteins');
     });
   }
-
-  QueryBuilder<Product, Product, QDistinct> distinctByShortDescription(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'shortDescription',
-          caseSensitive: caseSensitive);
-    });
-  }
 }
 
 extension ProductQueryProperty
@@ -1182,19 +1220,25 @@ extension ProductQueryProperty
     });
   }
 
-  QueryBuilder<Product, int?, QQueryOperations> caloriesProperty() {
+  QueryBuilder<Product, double?, QQueryOperations> caloriesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'calories');
     });
   }
 
-  QueryBuilder<Product, int?, QQueryOperations> carbohydratesProperty() {
+  QueryBuilder<Product, double?, QQueryOperations> carbohydratesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'carbohydrates');
     });
   }
 
-  QueryBuilder<Product, int?, QQueryOperations> fatsProperty() {
+  QueryBuilder<Product, String?, QQueryOperations> descriptionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'description');
+    });
+  }
+
+  QueryBuilder<Product, double?, QQueryOperations> fatsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fats');
     });
@@ -1206,21 +1250,15 @@ extension ProductQueryProperty
     });
   }
 
-  QueryBuilder<Product, int?, QQueryOperations> priceProperty() {
+  QueryBuilder<Product, double?, QQueryOperations> priceProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'price');
     });
   }
 
-  QueryBuilder<Product, int?, QQueryOperations> proteinsProperty() {
+  QueryBuilder<Product, double?, QQueryOperations> proteinsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'proteins');
-    });
-  }
-
-  QueryBuilder<Product, String?, QQueryOperations> shortDescriptionProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'shortDescription');
     });
   }
 }

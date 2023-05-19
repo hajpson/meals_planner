@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:meals_planner/constants/colors.dart';
+import 'package:meals_planner/constants/screen_indicator_enum.dart';
 
 class NoDataScreen extends StatefulWidget {
-  const NoDataScreen({super.key, required String this.usedPage});
+  const NoDataScreen({super.key, required ScreenIndicator this.usedPage});
 
-  final String usedPage;
+  final ScreenIndicator usedPage;
 
   @override
   State<NoDataScreen> createState() => _NoDataScreenState();
@@ -61,14 +61,14 @@ class _NoDataScreenState extends State<NoDataScreen>
                   padding: EdgeInsets.only(bottom: 50),
                   child: Image(
                       width: 100,
-                      image: widget.usedPage == "Meals"
+                      image: widget.usedPage == ScreenIndicator.Meals
                           ? AssetImage('images/no_data_image.png')
                           : AssetImage('images/shopping_basket_cross.png')),
                 )),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
               child: Text(
-                widget.usedPage == "Meals"
+                widget.usedPage == ScreenIndicator.Meals
                     ? "Oops!\nLooks like your meals list is empty.\nTry to add new meal first 😊"
                     : "Hmm ...\nYou haven't added any product yet.\nAdd new product first 😊",
                 textAlign: TextAlign.center,

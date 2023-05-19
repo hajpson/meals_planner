@@ -14,10 +14,10 @@ class MealModel {
 @embedded
 class Product {
   String? name;
-  String? shortDescription;
-  int? proteins;
-  int? carbohydrates;
-  int? fats;
-  int? calories;
-  int? price;
+  String? description;
+  double? proteins;
+  double? carbohydrates;
+  double? fats;
+  double? calories;
+  double? price;
 }
