@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:meals_planner/constants/colors.dart';
@@ -96,6 +95,7 @@ class _MealsScreenState extends ConsumerState<MealsScreen>
             child: Container(
                 child: MealsList(
           controller: mealsProvider,
+          widgetRef: ref,
         ))),
       ),
     );
@@ -112,9 +112,11 @@ String _getSumFromDoubleList(List<double?> list) {
 }
 
 class MealsList extends StatelessWidget {
-  const MealsList({super.key, required this.controller});
+  const MealsList(
+      {super.key, required this.controller, required this.widgetRef});
 
   final AsyncValue<List<MealModel>> controller;
+  final WidgetRef widgetRef;
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +144,7 @@ class MealsList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          controller[index].mealName!,
+                          controller[index].mealName ?? "",
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: middleColor,
@@ -152,7 +154,51 @@ class MealsList extends StatelessWidget {
                           splashRadius: 20,
                           color: errorColor,
                           icon: Icon(Icons.delete),
-                          onPressed: () => {},
+                          onPressed: () async {
+                            bool hasBeenDeleted = await widgetRef
+                                .read(mealsController.notifier)
+                                .deleteMeal(controller[index]);
+
+                            if (hasBeenDeleted) {
+                              controller.removeAt(index);
+                            }
+
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(hasBeenDeleted
+                                  ? SnackBar(
+                                      showCloseIcon: true,
+                                      closeIconColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(16))),
+                                      backgroundColor: successColor,
+                                      behavior: SnackBarBehavior.floating,
+                                      margin:
+                                          EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                      content: Text(
+                                        'Meal deleted successfully',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ))
+                                  : SnackBar(
+                                      showCloseIcon: true,
+                                      closeIconColor: Colors.white,
+                                      backgroundColor: errorColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(16))),
+                                      behavior: SnackBarBehavior.floating,
+                                      margin:
+                                          EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                      content: Text(
+                                        'Failed to delete meal - try again',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      )));
+                          },
                         ),
                       ],
                     ),
@@ -169,99 +215,91 @@ class MealsList extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12)),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  SizedBox(
-                                    width: 100,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Proteins',
-                                          style: TextStyle(
-                                            color: middleColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          controller[index].products == null
-                                              ? 0.toString()
-                                              : _getSumFromDoubleList(
-                                                  controller[index]
-                                                      .products!
-                                                      .map((product) =>
-                                                          product.proteins)
-                                                      .toList()),
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        )
-                                      ],
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Proteins',
+                                      style: TextStyle(
+                                        color: middleColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 100,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Carbs',
-                                          style: TextStyle(
-                                            color: middleColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          controller[index].products == null
-                                              ? 0.toString()
-                                              : _getSumFromDoubleList(
-                                                  controller[index]
-                                                      .products!
-                                                      .map((product) =>
-                                                          product.carbohydrates)
-                                                      .toList()),
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 100,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Fats',
-                                          style: TextStyle(
-                                            color: middleColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          controller[index].products == null
-                                              ? 0.toString()
-                                              : _getSumFromDoubleList(
-                                                  controller[index]
-                                                      .products!
-                                                      .map((product) =>
-                                                          product.fats)
-                                                      .toList()),
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                    Text(
+                                      controller[index].products == null
+                                          ? 0.toString()
+                                          : _getSumFromDoubleList(
+                                              controller[index]
+                                                  .products!
+                                                  .map((product) =>
+                                                      product.proteins)
+                                                  .toList()),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Carbs',
+                                      style: TextStyle(
+                                        color: middleColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      controller[index].products == null
+                                          ? 0.toString()
+                                          : _getSumFromDoubleList(
+                                              controller[index]
+                                                  .products!
+                                                  .map((product) =>
+                                                      product.carbohydrates)
+                                                  .toList()),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Fats',
+                                      style: TextStyle(
+                                        color: middleColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      controller[index].products == null
+                                          ? 0.toString()
+                                          : _getSumFromDoubleList(
+                                              controller[index]
+                                                  .products!
+                                                  .map(
+                                                      (product) => product.fats)
+                                                  .toList()),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

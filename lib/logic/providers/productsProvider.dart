@@ -15,4 +15,10 @@ class ProductsAsyncNotifier extends StateNotifier<AsyncValue<List<Product>>> {
     var productsData = await getProductsAsync();
     state = AsyncData(productsData);
   }
+
+  void getSearchedProducts(String phrase) async {
+    state = AsyncLoading();
+    var filteredProducts = await getFilteredProductsAsync(phrase);
+    state = AsyncData(filteredProducts);
+  }
 }

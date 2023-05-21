@@ -15,4 +15,16 @@ class MealsAsyncNotifier extends StateNotifier<AsyncValue<List<MealModel>>> {
     var mealsData = await getMealsAsync();
     state = AsyncData(mealsData);
   }
+
+  Future<bool> deleteMeal(MealModel meal) async {
+    bool hasBeenDeleted = await deleteMealAsync(meal);
+    if (hasBeenDeleted) {
+      var mealsData = await getMealsAsync();
+      state = AsyncData(mealsData);
+      
+      return true;
+    }
+
+    return false;
+  }
 }
