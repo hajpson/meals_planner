@@ -97,20 +97,23 @@ class NewMealLayout extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: lightGreyColor,
-                          borderRadius: new BorderRadius.circular(16)),
+                        color: lightGreyColor,
+                        borderRadius: new BorderRadius.circular(16),
+                      ),
                       child: Padding(
-                        padding: EdgeInsets.only(left: 15, right: 15, top: 5),
+                        padding: EdgeInsets.only(
+                            left: 15, right: 15, top: 5, bottom: 5),
                         child: TextFormField(
                           controller: mealNameController,
                           cursorColor: secondaryColor,
                           decoration: InputDecoration(
-                              border: InputBorder.none,
-                              labelText: 'Meal name',
-                              labelStyle: TextStyle(
-                                color: secondaryColor,
-                                fontWeight: FontWeight.bold,
-                              )),
+                            border: InputBorder.none,
+                            labelText: 'Meal name',
+                            labelStyle: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -122,7 +125,8 @@ class NewMealLayout extends StatelessWidget {
                           color: lightGreyColor,
                           borderRadius: new BorderRadius.circular(16)),
                       child: Padding(
-                        padding: EdgeInsets.only(left: 15, right: 15, top: 5),
+                        padding: EdgeInsets.only(
+                            left: 15, right: 15, top: 5, bottom: 5),
                         child: TextFormField(
                           controller: mealDescController,
                           maxLength: 10000,
@@ -160,7 +164,7 @@ class NewMealLayout extends StatelessWidget {
                               });
                         },
                         child: Text(
-                          'Press to add product',
+                          'Press to add products',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,

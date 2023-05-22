@@ -56,3 +56,36 @@ Future<bool> deleteProductAsync(Product product) async {
 
   return hasBeenDeleted;
 }
+
+Future<List<Product>> getFilteredProductsAsync(String phrase) async {
+  List<Product> products = [];
+  final isar = await getOpenedProductsInstance();
+
+  if (isar != null && isar.isOpen) {
+    await isar.txn(() async {
+      var result = await isar.products
+          .filter()
+          .nameContains(phrase)
+          .or()
+          .descriptionContains(phrase)
+          .findAll();
+
+      products = result;
+    });
+  } else {
+    final newIsar = await initializeProductsInstance();
+
+    await newIsar.txn(() async {
+      var result = await newIsar.products
+          .filter()
+          .nameContains(phrase)
+          .or()
+          .descriptionContains(phrase)
+          .findAll();
+
+      products = result;
+    });
+  }
+
+  return products;
+}

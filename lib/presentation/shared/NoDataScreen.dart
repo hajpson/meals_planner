@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:meals_planner/constants/screen_indicator_enum.dart';
 
@@ -13,6 +15,7 @@ class NoDataScreen extends StatefulWidget {
 class _NoDataScreenState extends State<NoDataScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
+  late Timer timer;
 
   @override
   void initState() {
@@ -21,13 +24,17 @@ class _NoDataScreenState extends State<NoDataScreen>
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
 
-    controller.forward();
+    if (mounted) {
+      controller.forward();
+    }
+
+    timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+      controller.reverse();
+    });
 
     controller.addListener(() {
       if (controller.isCompleted) {
-        Future.delayed(Duration(seconds: 2), () {
-          controller.reverse();
-        });
+        timer;
       }
 
       if (controller.isDismissed) {
@@ -39,6 +46,7 @@ class _NoDataScreenState extends State<NoDataScreen>
   @override
   void dispose() {
     controller.dispose();
+    timer.cancel();
     super.dispose();
   }
 
