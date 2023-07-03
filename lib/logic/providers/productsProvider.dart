@@ -16,6 +16,18 @@ class ProductsAsyncNotifier extends StateNotifier<AsyncValue<List<Product>>> {
     state = AsyncData(productsData);
   }
 
+  Future<bool> deleteProduct(Product product) async {
+    bool hasBeenDeleted = await deleteProductAsync(product);
+    if (hasBeenDeleted) {
+      var productsData = await getProductsAsync();
+      state = AsyncData(productsData);
+
+      return true;
+    }
+
+    return false;
+  }
+
   void getSearchedProducts(String phrase) async {
     state = AsyncLoading();
     var filteredProducts = await getFilteredProductsAsync(phrase);

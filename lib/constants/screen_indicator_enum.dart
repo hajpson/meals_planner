@@ -1,1 +1,1 @@
-enum ScreenIndicator { Meals, Products }
+enum ScreenIndicator { Meals, Products, Settings }

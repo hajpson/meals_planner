@@ -28,20 +28,69 @@ class _SearchProductsViewState extends State<SearchProductsView> {
           children: [
             Align(
               alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Go back'),
-                ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 15),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            shadowColor: Color.fromARGB(53, 0, 0, 0)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.arrow_back,
+                              color: Color.fromARGB(212, 255, 255, 255),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                'Go back',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Color.fromARGB(212, 255, 255, 255)),
+                              ),
+                            ),
+                          ],
+                        )),
+                  ),
+                ],
               ),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: SelectableProducts(),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Container(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      backgroundColor: primaryColor,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      shadowColor: Color.fromARGB(53, 0, 0, 0)),
+                  onPressed: () {},
+                  child: Text(
+                    'Add products',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color.fromARGB(212, 255, 255, 255)),
+                  ),
+                ),
               ),
             ),
           ],
@@ -178,6 +227,8 @@ class _SelectableProductsState extends State<SelectableProducts> {
                             physics: BouncingScrollPhysics(),
                             itemCount: selectedItems.length,
                             itemBuilder: (context, index) => InkWell(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12)),
                               onTap: () => _handleItemTap(selectedItems[index]),
                               child: Container(
                                 decoration: BoxDecoration(

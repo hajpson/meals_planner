@@ -96,6 +96,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen>
           child: Container(
             child: ProductsList(
               controller: productsProvider,
+              widgetRef: ref,
             ),
           ),
         ),
@@ -105,9 +106,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen>
 }
 
 class ProductsList extends StatelessWidget {
-  const ProductsList({super.key, required this.controller});
+  const ProductsList(
+      {super.key, required this.controller, required this.widgetRef});
 
   final AsyncValue<List<Product>> controller;
+  final WidgetRef widgetRef;
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +148,51 @@ class ProductsList extends StatelessWidget {
                               splashRadius: 20,
                               color: errorColor,
                               icon: Icon(Icons.delete),
-                              onPressed: () => {},
+                              onPressed: () async {
+                                bool hasBeenDeleted = await widgetRef
+                                    .read(productsController.notifier)
+                                    .deleteProduct(controller[index]);
+
+                                if (hasBeenDeleted) {
+                                  controller.removeAt(index);
+                                }
+
+                                ScaffoldMessenger.of(context)
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(hasBeenDeleted
+                                      ? SnackBar(
+                                          showCloseIcon: true,
+                                          closeIconColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(16))),
+                                          backgroundColor: successColor,
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: EdgeInsets.fromLTRB(
+                                              20, 0, 20, 20),
+                                          content: Text(
+                                            'Product deleted successfully',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ))
+                                      : SnackBar(
+                                          showCloseIcon: true,
+                                          closeIconColor: Colors.white,
+                                          backgroundColor: errorColor,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(16))),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: EdgeInsets.fromLTRB(
+                                              20, 0, 20, 20),
+                                          content: Text(
+                                            'Failed to delete product - try again',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          )));
+                              },
                             )
                           ],
                         ),
