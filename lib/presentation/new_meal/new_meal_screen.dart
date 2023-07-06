@@ -7,6 +7,8 @@ import 'package:meals_planner/logic/providers/newMealProvider.dart';
 import 'package:meals_planner/models/MealModel.dart';
 import 'package:meals_planner/presentation/new_meal/search_products_view.dart';
 
+import '../../models/SelectableProduct.dart';
+
 class NewMealScreen extends ConsumerWidget {
   NewMealScreen({Key? key}) : super(key: key);
 
@@ -22,30 +24,36 @@ class NewMealScreen extends ConsumerWidget {
   }
 }
 
-class NewMealLayout extends StatelessWidget {
+class NewMealLayout extends StatefulWidget {
   NewMealLayout({super.key, required this.controller, required this.widgetRef});
 
   final CustomProviderIdentifier controller;
   final WidgetRef widgetRef;
 
+  @override
+  State<NewMealLayout> createState() => _NewMealLayoutState();
+}
+
+class _NewMealLayoutState extends State<NewMealLayout> {
   final mealNameController = TextEditingController();
   final mealDescController = TextEditingController();
+  late List<SelectableProduct> selectedProducts = [];
 
   @override
   Widget build(BuildContext context) {
-    if (controller == CustomProviderIdentifier.Loading) {
+    if (widget.controller == CustomProviderIdentifier.Loading) {
       return Center(
         child: SpinKitThreeBounce(color: middleColor),
       );
-    } else if (controller == CustomProviderIdentifier.Success) {
+    } else if (widget.controller == CustomProviderIdentifier.Success) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pop(true);
         return;
       });
-    } else if (controller == CustomProviderIdentifier.Error) {
+    } else if (widget.controller == CustomProviderIdentifier.Error) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pop(false);
-        widgetRef.read(newMealController.notifier).dispose();
+        widget.widgetRef.read(newMealController.notifier).dispose();
         return;
       });
     }
@@ -144,6 +152,17 @@ class NewMealLayout extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Visibility(
+                    visible: !selectedProducts.isEmpty,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        selectedProducts.length == 1
+                            ? 'Selected 1 product'
+                            : 'Selected ${selectedProducts.length} products',
+                      ),
+                    ),
+                  ),
                   Padding(
                     padding: EdgeInsets.all(10),
                     child: Container(
@@ -156,12 +175,27 @@ class NewMealLayout extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             shadowColor: Color.fromARGB(53, 0, 0, 0)),
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return SearchProductsView();
-                              });
+                        onPressed: () async {
+                          List<SelectableProduct>? result =
+                              await showDialog<List<SelectableProduct>>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SearchProductsView(
+                                      alreadySelectedItems: selectedProducts,
+                                    );
+                                  });
+
+                          if (result == null || result.isEmpty) {
+                            setState(() {
+                              selectedProducts = [];
+                            });
+
+                            return;
+                          }
+
+                          setState(() {
+                            selectedProducts = result;
+                          });
                         },
                         child: Text(
                           'Press to add products',
@@ -191,7 +225,7 @@ class NewMealLayout extends StatelessWidget {
                               ..mealName = mealNameController.text
                               ..mealDescription = mealDescController.text;
 
-                            await widgetRef
+                            await widget.widgetRef
                                 .read(newMealController.notifier)
                                 .addMeal(newMeal);
                           },

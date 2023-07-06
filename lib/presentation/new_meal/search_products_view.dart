@@ -6,16 +6,72 @@ import '../../constants/colors.dart';
 import '../../models/SelectableProduct.dart';
 
 class SearchProductsView extends StatefulWidget {
-  SearchProductsView({Key? key}) : super(key: key);
+  SearchProductsView({Key? key, this.alreadySelectedItems}) : super(key: key);
+
+  List<SelectableProduct>? alreadySelectedItems;
 
   @override
   State<SearchProductsView> createState() => _SearchProductsViewState();
 }
 
 class _SearchProductsViewState extends State<SearchProductsView> {
+  late final Future<List<SelectableProduct>> selectableProductsFuture;
+  var allItems = List<SelectableProduct>.empty(growable: true);
+  var selectableItems = List<SelectableProduct>.empty(growable: true);
+  final TextEditingController inputController = TextEditingController();
+  bool isInitializing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    selectableProductsFuture = initialize();
+    inputController.addListener(_handleOnTextChange);
+  }
+
   @override
   void dispose() {
+    inputController.dispose();
     super.dispose();
+  }
+
+  Future<List<SelectableProduct>> initialize() async {
+    var productsData = await getProductsAsync();
+
+    var alreadySelectedProducts = widget.alreadySelectedItems;
+
+    for (var product in productsData) {
+      allItems.add(SelectableProduct(product: product, isSelected: false));
+    }
+
+    if (alreadySelectedProducts != null && !alreadySelectedProducts.isEmpty) {
+      for (var selectedProduct in alreadySelectedProducts) {
+        allItems
+            .singleWhere((selectableProduct) =>
+                selectableProduct.product.id == selectedProduct.product.id)
+            .isSelected = true;
+      }
+    }
+
+    selectableItems = allItems;
+
+    return allItems;
+  }
+
+  void _handleItemTap(SelectableProduct item) {
+    setState(() {
+      item.isSelected = !item.isSelected;
+    });
+  }
+
+  void _handleOnTextChange() {
+    var filteredItems = allItems
+        .where(
+            (element) => element.product.name!.contains(inputController.text))
+        .toList();
+
+    setState(() {
+      selectableItems = filteredItems;
+    });
   }
 
   @override
@@ -40,7 +96,9 @@ class _SearchProductsViewState extends State<SearchProductsView> {
                                 borderRadius: BorderRadius.circular(12)),
                             shadowColor: Color.fromARGB(53, 0, 0, 0)),
                         onPressed: () {
-                          Navigator.pop(context);
+                          var initialItems = widget.alreadySelectedItems;
+
+                          Navigator.pop(context, initialItems);
                         },
                         child: Row(
                           children: [
@@ -67,7 +125,225 @@ class _SearchProductsViewState extends State<SearchProductsView> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: SelectableProducts(),
+                child: FutureBuilder<List<SelectableProduct>>(
+                  future: selectableProductsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: SpinKitThreeBounce(color: middleColor),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Something went wrong'),
+                            Icon(Icons.close),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Column(children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: lightGreyColor,
+                                borderRadius: new BorderRadius.circular(16)),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 15, right: 15, top: 5, bottom: 5),
+                              child: TextField(
+                                controller: inputController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'Product name',
+                                  labelStyle: TextStyle(
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: allItems.isEmpty
+                              ? Align(
+                                  alignment: Alignment.center,
+                                  child: Center(
+                                    child: Text(
+                                      'Seems like you have no products.\nTry to add some first and then come back here 😊',
+                                    ),
+                                  ),
+                                )
+                              : selectableItems.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        'No results found, try with different search.',
+                                      ),
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: ListView.separated(
+                                        separatorBuilder: (context, index) =>
+                                            Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(0, 6, 0, 6),
+                                        ),
+                                        scrollDirection: Axis.vertical,
+                                        shrinkWrap: true,
+                                        padding:
+                                            EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                        physics: BouncingScrollPhysics(),
+                                        itemCount: selectableItems.length,
+                                        itemBuilder: (context, index) =>
+                                            InkWell(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12)),
+                                          onTap: () => _handleItemTap(
+                                              selectableItems[index]),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: selectableItems[index]
+                                                        .isSelected
+                                                    ? selectedColor
+                                                    : lightGreyColor,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(12))),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: Column(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      selectableItems[index]
+                                                              .product
+                                                              .name ??
+                                                          "",
+                                                      style: TextStyle(
+                                                        color: primaryColor,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 8),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      12)),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                0, 8, 0, 4),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceEvenly,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                    'Proteins',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color:
+                                                                          primaryColor,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectableItems[index].product.proteins} g',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                    'Carbs',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color:
+                                                                          primaryColor,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectableItems[index].product.carbohydrates} g',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                    'Fats',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color:
+                                                                          primaryColor,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${selectableItems[index].product.fats} g',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                        ),
+                      ]);
+                    }
+                  },
+                ),
               ),
             ),
             Padding(
@@ -82,7 +358,13 @@ class _SearchProductsViewState extends State<SearchProductsView> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       shadowColor: Color.fromARGB(53, 0, 0, 0)),
-                  onPressed: () {},
+                  onPressed: () {
+                    var selectedItems = selectableItems
+                        .where((element) => element.isSelected)
+                        .toList();
+
+                    Navigator.pop(context, selectedItems);
+                  },
                   child: Text(
                     'Add products',
                     style: TextStyle(
@@ -96,253 +378,6 @@ class _SearchProductsViewState extends State<SearchProductsView> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class SelectableProducts extends StatefulWidget {
-  SelectableProducts({super.key});
-
-  @override
-  State<SelectableProducts> createState() => _SelectableProductsState();
-}
-
-class _SelectableProductsState extends State<SelectableProducts> {
-  late final Future<List<SelectableProduct>> selectableProductsFuture;
-  var allItems = List<SelectableProduct>.empty(growable: true);
-  var selectedItems = List<SelectableProduct>.empty(growable: true);
-  final TextEditingController inputController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    selectableProductsFuture = initialize();
-    inputController.addListener(_handleOnTextChange);
-  }
-
-  @override
-  void dispose() {
-    inputController.dispose();
-    super.dispose();
-  }
-
-  Future<List<SelectableProduct>> initialize() async {
-    var productsData = await getProductsAsync();
-
-    for (var product in productsData) {
-      allItems.add(SelectableProduct(product: product, isSelected: false));
-    }
-
-    selectedItems = allItems;
-
-    return allItems;
-  }
-
-  void _handleItemTap(SelectableProduct item) {
-    setState(() {
-      item.isSelected = !item.isSelected;
-    });
-  }
-
-  void _handleOnTextChange() {
-    var filteredItems = allItems
-        .where(
-            (element) => element.product.name!.contains(inputController.text))
-        .toList();
-
-    setState(() {
-      selectedItems = filteredItems;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<SelectableProduct>>(
-      future: selectableProductsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: SpinKitThreeBounce(color: middleColor),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Something went wrong'),
-                Icon(Icons.close),
-              ],
-            ),
-          );
-        } else {
-          return Column(children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: lightGreyColor,
-                    borderRadius: new BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 15, right: 15, top: 5, bottom: 5),
-                  child: TextField(
-                    controller: inputController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: 'Product name',
-                      labelStyle: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: allItems.isEmpty
-                  ? Align(
-                      alignment: Alignment.center,
-                      child: Center(
-                        child: Text(
-                          'Seems like you have no products.\nTry to add some first and then come back here 😊',
-                        ),
-                      ),
-                    )
-                  : selectedItems.isEmpty
-                      ? Center(
-                          child: Text(
-                            'No results found, try with different search.',
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) => Padding(
-                              padding: EdgeInsets.fromLTRB(0, 6, 0, 6),
-                            ),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
-                            physics: BouncingScrollPhysics(),
-                            itemCount: selectedItems.length,
-                            itemBuilder: (context, index) => InkWell(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12)),
-                              onTap: () => _handleItemTap(selectedItems[index]),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: selectedItems[index].isSelected
-                                        ? selectedColor
-                                        : lightGreyColor,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(12))),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          selectedItems[index].product.name ??
-                                              "",
-                                          style: TextStyle(
-                                            color: primaryColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 8, 0, 4),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        'Proteins',
-                                                        style: TextStyle(
-                                                          color: primaryColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '${selectedItems[index].product.proteins} g',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        'Carbs',
-                                                        style: TextStyle(
-                                                          color: primaryColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '${selectedItems[index].product.carbohydrates} g',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        'Fats',
-                                                        style: TextStyle(
-                                                          color: primaryColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '${selectedItems[index].product.fats} g',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-            ),
-          ]);
-        }
-      },
     );
   }
 }
